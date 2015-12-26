@@ -1,0 +1,74 @@
+/*
+  Heater  Controller.
+  Single output to heater (or other device) controlled by four inputs,
+  three with timers 30min, 20mins, 15mins & the fourth to turn everything off!
+  Just in case, you can't be to careful can you?
+
+  Operating via a handheld 4Ch wireless keyfob TX & assembled 4Ch O/P RX board,
+  feeding directly into the Arduino.
+
+  This sketch to be used on a Digispark, as full Uno overkill?
+
+  Might be interesting to use an analogue input to make sure system voltage 
+  is OK before activating the OP?
+
+  Use another to sense the ambient temp so it turns off or does not turn on?
+
+  Use an anologue IP instead of digital to allow use of the other two analogue pins?
+
+  Code borrowed from DojoDave <http://www.0j0.org> modified 30 Aug 2011 by Tom Igoe
+
+  Main loop & guidance supplied by Steve Baines.  Thank you very, VERY much.
+
+  Mashed incompetantly together by JMHC 16 December 2015
+
+ */
+
+// constants:
+const int buttonA = 0;     // the number of the RX pin D0 (button A) Input used here
+const int buttonB = 1;     // the number of the RX pin D1 (button B) Input used here
+const int buttonC = 2;     // the number of the RX pin D2 (button C) Input used here
+const int buttonD = 3;     // the number of the RX pin D3 (button D) Input used here
+
+const int output0 =  4;       // the number of the output
+
+void setup() {
+  // initialize the LED pin as an output:
+  pinMode(output0, OUTPUT);
+  // initialize the RX outputs pins as an inputs:
+  pinMode(buttonA, INPUT);
+  pinMode(buttonB, INPUT);
+  pinMode(buttonC, INPUT);
+  pinMode(buttonD, INPUT);
+ }
+ 
+// Steves bit to get it working, blimey that got it!
+
+ void loop() {
+  
+  static long ticksRemaining = 0;
+
+  if (digitalRead(buttonA))
+    ticksRemaining = 600; // 30mins = 30mins * 60secs/min * 10loops/sec = 18000 iterations of main loop ( 600=1 min )
+
+  if (digitalRead(buttonB))
+    ticksRemaining = 300; // 20mins = 12000 loops
+
+  if (digitalRead(buttonC))
+    ticksRemaining = 150; // 15mins = 9000 loops
+
+  if (digitalRead(buttonD))
+    ticksRemaining = 0; // Stop now!
+
+  if (ticksRemaining <= 0)
+  {
+    digitalWrite(output0, 0);   // Switch output off
+  }
+  else
+  {
+    digitalWrite(output0, 1);   // Turn output on
+    ticksRemaining = ticksRemaining - 1;
+  }
+
+  delay(100); // Wait 0.1s, so 10 iterations per second
+}
